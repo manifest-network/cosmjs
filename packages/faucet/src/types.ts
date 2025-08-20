@@ -1,4 +1,4 @@
-import { Coin } from "@liftedinit/stargate";
+import { Coin } from "@manifest-network/stargate";
 
 export interface SendJob {
   readonly sender: string;

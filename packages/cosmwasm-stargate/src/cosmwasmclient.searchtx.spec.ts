@@ -16,7 +16,7 @@ import {
   isDeliverTxFailure,
   isDeliverTxSuccess,
   isMsgSendEncodeObject,
-} from "@liftedinit/stargate";
+} from "@manifest-network/stargate";
 import { assert, sleep } from "@cosmjs/utils";
 import { TxRaw } from "cosmjs-types/cosmos/tx/v1beta1/tx";
 

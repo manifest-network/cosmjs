@@ -1,4 +1,4 @@
-import { Coin } from "@liftedinit/stargate";
+import { Coin } from "@manifest-network/stargate";
 
 import { MinimalAccount, SendJob } from "./types";
 

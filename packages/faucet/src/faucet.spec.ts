@@ -1,6 +1,6 @@
 import { Random } from "@cosmjs/crypto";
 import { toBech32 } from "@cosmjs/encoding";
-import { makeCosmoshubPath, StargateClient } from "@liftedinit/stargate";
+import { makeCosmoshubPath, StargateClient } from "@manifest-network/stargate";
 import { assert } from "@cosmjs/utils";
 
 import { Faucet } from "./faucet";

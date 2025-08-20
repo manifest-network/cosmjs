@@ -6,7 +6,7 @@ import {
   GasPrice,
   MsgSendEncodeObject,
   SigningStargateClient,
-} from "@liftedinit/stargate";
+} from "@manifest-network/stargate";
 
 // Wallet
 const mnemonic =

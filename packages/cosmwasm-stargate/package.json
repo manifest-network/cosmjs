@@ -45,7 +45,7 @@
     "@cosmjs/proto-signing": "workspace:^",
     "@cosmjs/tendermint-rpc": "workspace:^",
     "@cosmjs/utils": "workspace:^",
-    "@liftedinit/stargate": "workspace:^",
+    "@manifest-network/stargate": "workspace:^",
     "cosmjs-types": "^0.9.0",
     "pako": "^2.0.2"
   },

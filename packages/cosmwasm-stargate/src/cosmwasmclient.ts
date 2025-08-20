@@ -21,7 +21,7 @@ import {
   setupTxExtension,
   TimeoutError,
   TxExtension,
-} from "@liftedinit/stargate";
+} from "@manifest-network/stargate";
 import { CometClient, connectComet, HttpEndpoint, toRfc3339WithNanoseconds } from "@cosmjs/tendermint-rpc";
 import { assert, sleep } from "@cosmjs/utils";
 import { TxMsgData } from "cosmjs-types/cosmos/base/abci/v1beta1/abci";
@@ -246,7 +246,7 @@ export class CosmWasmClient {
    * If the transaction is included in a block, a `DeliverTxResponse` is returned. The caller then
    * usually needs to check for execution success or failure.
    */
-  // NOTE: This method is tested against slow chains and timeouts in the @liftedinit/stargate package.
+  // NOTE: This method is tested against slow chains and timeouts in the @manifest-network/stargate package.
   // Make sure it is kept in sync!
   public async broadcastTx(
     tx: Uint8Array,

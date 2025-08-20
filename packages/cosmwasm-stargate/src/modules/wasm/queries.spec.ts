@@ -9,7 +9,7 @@ import {
   DeliverTxResponse,
   SigningStargateClient,
   StdFee,
-} from "@liftedinit/stargate";
+} from "@manifest-network/stargate";
 import { assert, assertDefined } from "@cosmjs/utils";
 import { MsgExecuteContract, MsgInstantiateContract, MsgStoreCode } from "cosmjs-types/cosmwasm/wasm/v1/tx";
 import { AbsoluteTxPosition, ContractCodeHistoryOperationType } from "cosmjs-types/cosmwasm/wasm/v1/types";

@@ -6,7 +6,7 @@ import {
   calculateFee,
   assertIsDeliverTxSuccess,
   GasPrice,
-} from "@liftedinit/stargate";
+} from "@manifest-network/stargate";
 
 // Wallet
 const wallet = await DirectSecp256k1HdWallet.fromMnemonic(

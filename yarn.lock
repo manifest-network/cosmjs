@@ -346,7 +346,7 @@ __metadata:
     "@cosmjs/tendermint-rpc": "workspace:^"
     "@cosmjs/utils": "workspace:^"
     "@istanbuljs/nyc-config-typescript": ^1.0.1
-    "@liftedinit/stargate": "workspace:^"
+    "@manifest-network/stargate": "workspace:^"
     "@types/babylon": ^6.16.3
     "@types/diff": ^4
     "@types/eslint-plugin-prettier": ^3
@@ -393,7 +393,7 @@ __metadata:
     "@cosmjs/tendermint-rpc": "workspace:^"
     "@cosmjs/utils": "workspace:^"
     "@istanbuljs/nyc-config-typescript": ^1.0.1
-    "@liftedinit/stargate": "workspace:^"
+    "@manifest-network/stargate": "workspace:^"
     "@types/eslint-plugin-prettier": ^3
     "@types/jasmine": ^4
     "@types/karma-firefox-launcher": ^2
@@ -581,7 +581,7 @@ __metadata:
     "@cosmjs/utils": "workspace:^"
     "@istanbuljs/nyc-config-typescript": ^1.0.1
     "@koa/cors": ^3.3
-    "@liftedinit/stargate": "workspace:^"
+    "@manifest-network/stargate": "workspace:^"
     "@types/eslint-plugin-prettier": ^3
     "@types/jasmine": ^4
     "@types/koa": ^2.13
@@ -667,7 +667,7 @@ __metadata:
     "@ledgerhq/hw-transport": ^5.25.0
     "@ledgerhq/hw-transport-node-hid": ^5.25.0
     "@ledgerhq/hw-transport-webusb": ^5.25.0
-    "@liftedinit/stargate": "workspace:^"
+    "@manifest-network/stargate": "workspace:^"
     "@types/eslint-plugin-prettier": ^3
     "@types/jasmine": ^4
     "@types/ledgerhq__hw-transport": ^4.21.3
@@ -1197,9 +1197,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@liftedinit/stargate@workspace:^, @liftedinit/stargate@workspace:packages/stargate":
+"@manifest-network/stargate@workspace:^, @manifest-network/stargate@workspace:packages/stargate":
   version: 0.0.0-use.local
-  resolution: "@liftedinit/stargate@workspace:packages/stargate"
+  resolution: "@manifest-network/stargate@workspace:packages/stargate"
   dependencies:
     "@confio/ics23": ^0.6.8
     "@cosmjs/amino": "workspace:^"
@@ -3094,7 +3094,7 @@ __metadata:
     "@cosmjs/crypto": "workspace:^"
     "@cosmjs/encoding": "workspace:^"
     "@cosmjs/proto-signing": "workspace:^"
-    "@liftedinit/stargate": "workspace:^"
+    "@manifest-network/stargate": "workspace:^"
     eslint: ^7.5
     prettier: ^2.8.8
     typescript: ~4.9

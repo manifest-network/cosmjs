@@ -1,4 +1,4 @@
-import { StargateClient } from "@liftedinit/stargate";
+import { StargateClient } from "@manifest-network/stargate";
 
 import { Webserver } from "../api/webserver";
 import * as constants from "../constants";

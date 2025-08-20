@@ -10,7 +10,7 @@ import {
   Registry,
   TxBodyEncodeObject,
 } from "@cosmjs/proto-signing";
-import { assertIsDeliverTxSuccess, coins, MsgSendEncodeObject, StdFee } from "@liftedinit/stargate";
+import { assertIsDeliverTxSuccess, coins, MsgSendEncodeObject, StdFee } from "@manifest-network/stargate";
 import { assert, sleep } from "@cosmjs/utils";
 import { TxRaw } from "cosmjs-types/cosmos/tx/v1beta1/tx";
 import { ReadonlyDate } from "readonly-date";

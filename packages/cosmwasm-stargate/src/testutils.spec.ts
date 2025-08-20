@@ -17,7 +17,7 @@ import {
   QueryClient,
   setupAuthExtension,
   setupBankExtension,
-} from "@liftedinit/stargate";
+} from "@manifest-network/stargate";
 import { Tendermint34Client } from "@cosmjs/tendermint-rpc";
 import { assertDefinedAndNotNull } from "@cosmjs/utils";
 import { SignMode } from "cosmjs-types/cosmos/tx/signing/v1beta1/signing";

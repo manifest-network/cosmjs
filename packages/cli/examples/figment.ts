@@ -1,4 +1,4 @@
-import { StargateClient } from "@liftedinit/stargate";
+import { StargateClient } from "@manifest-network/stargate";
 
 // Network config
 const rpcEndpoint = {

@@ -1,4 +1,4 @@
-import { GasPrice } from "@liftedinit/stargate";
+import { GasPrice } from "@manifest-network/stargate";
 
 import { TokenConfiguration } from "./tokenmanager";
 import { parseBankTokens } from "./tokens";

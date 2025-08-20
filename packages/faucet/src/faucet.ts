@@ -3,7 +3,7 @@ import {
   calculateFee,
   SigningStargateClient,
   StargateClient,
-} from "@liftedinit/stargate";
+} from "@manifest-network/stargate";
 import { isDefined, sleep } from "@cosmjs/utils";
 
 import * as constants from "./constants";
