@@ -1,0 +1,120 @@
+name: Manifest dependency release
+
+on:
+  pull_request:
+    branches: [manifest/0.32]
+  workflow_dispatch:
+    inputs:
+      package:
+        description: Reviewed package to publish (ICS23 must precede Stargate)
+        required: true
+        type: choice
+        options: [ics23, stargate]
+      version:
+        description: Exact NEW version already committed in package.json
+        required: true
+        type: string
+      source_sha:
+        description: Full reviewed commit SHA (must be the selected manifest/0.32 commit)
+        required: true
+        type: string
+
+permissions:
+  contents: read
+
+concurrency:
+  group: manifest-dependency-release-${{ github.event_name }}-${{ github.event.pull_request.number || 'publish' }}
+  cancel-in-progress: false
+
+env:
+  NPM_CONFIG_REGISTRY: https://registry.npmjs.org/
+  NPM_CONFIG_IGNORE_SCRIPTS: "true"
+
+jobs:
+  build:
+    if: github.repository == 'manifest-network/cosmjs'
+    runs-on: ubuntu-24.04
+    strategy:
+      fail-fast: false
+      matrix:
+        package: ${{ fromJSON(github.event_name == 'workflow_dispatch' && format('["{0}"]', inputs.package) || '["ics23","stargate"]') }}
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
+        with:
+          node-version: 24.15.0
+          package-manager-cache: false
+      - name: Install the pinned npm CLI with patched Sigstore verification
+        run: npm install --global --ignore-scripts --no-audit --no-fund npm@11.19.1
+      - name: Test publication guards
+        run: node --test scripts/manifest-release.test.mjs
+      - name: Validate reviewed dispatch
+        if: github.event_name == 'workflow_dispatch'
+        env:
+          RELEASE_TARGET: ${{ inputs.package }}
+          RELEASE_VERSION: ${{ inputs.version }}
+          RELEASE_SHA: ${{ inputs.source_sha }}
+        run: node scripts/manifest-release.mjs guard
+      - name: Build, run compatibility tests, audit, and pack
+        env:
+          RELEASE_TARGET: ${{ matrix.package }}
+        run: node scripts/manifest-release.mjs build "$RELEASE_TARGET" "$RUNNER_TEMP/release"
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        with:
+          name: manifest-${{ matrix.package }}
+          path: |
+            ${{ runner.temp }}/release/*.tgz
+            ${{ runner.temp }}/release/release.json
+          if-no-files-found: error
+          retention-days: 14
+
+  publish:
+    if: github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/manifest/0.32' && github.repository == 'manifest-network/cosmjs'
+    needs: build
+    runs-on: ubuntu-24.04
+    environment: npm-release
+    permissions:
+      contents: read
+      id-token: write
+    env:
+      RELEASE_TARGET: ${{ inputs.package }}
+      RELEASE_VERSION: ${{ inputs.version }}
+      RELEASE_SHA: ${{ inputs.source_sha }}
+      NPM_CONFIG_PROVENANCE: "true"
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
+        with:
+          node-version: 24.15.0
+          package-manager-cache: false
+      - name: Install the pinned npm CLI with patched Sigstore verification
+        run: npm install --global --ignore-scripts --no-audit --no-fund npm@11.19.1
+      - name: Enforce clean tokenless npm configuration
+        run: |
+          touch "$RUNNER_TEMP/release-user.npmrc" "$RUNNER_TEMP/release-global.npmrc"
+          echo "NPM_CONFIG_USERCONFIG=$RUNNER_TEMP/release-user.npmrc" >> "$GITHUB_ENV"
+          echo "NPM_CONFIG_GLOBALCONFIG=$RUNNER_TEMP/release-global.npmrc" >> "$GITHUB_ENV"
+          test "$(npm --version)" = 11.19.1
+          test ! -f .npmrc
+      - uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4.3.0
+        with:
+          name: manifest-${{ inputs.package }}
+          path: ${{ runner.temp }}/release
+      - name: Recheck source, package identity, and artifact integrity
+        run: |
+          node scripts/manifest-release.mjs guard
+          node scripts/manifest-release.mjs validate "$RELEASE_TARGET" "$RUNNER_TEMP/release" "$RELEASE_VERSION" "$RELEASE_SHA"
+      - name: Publish this tested artifact using npm OIDC
+        run: node scripts/manifest-release.mjs publish "$RELEASE_TARGET" "$RUNNER_TEMP/release" "$RELEASE_VERSION" "$RELEASE_SHA"
+      - name: Verify registry integrity, signed provenance, and reviewed source
+        run: node scripts/manifest-release.mjs verify "$RELEASE_TARGET" "$RUNNER_TEMP/release" "$RELEASE_VERSION" "$RELEASE_SHA"
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        with:
+          name: verified-${{ inputs.package }}-${{ inputs.version }}
+          path: ${{ runner.temp }}/release/verified-publication.json
+          if-no-files-found: error
+          retention-days: 90
