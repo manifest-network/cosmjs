@@ -8,7 +8,10 @@ import { fileURLToPath } from "node:url";
 // Build against the same published CosmJS packages consumers install, without
 // relying on monorepo workspace artifacts or publishing unrelated workspaces.
 const root = fileURLToPath(new URL("../", import.meta.url));
-assert.equal(process.argv.length, 3, "Usage: node scripts/build-manifest-stargate.mjs OUTPUT_DIRECTORY");
+assert.ok(
+  process.argv.length === 3 || (process.argv.length === 4 && process.argv[3] === "--refresh-lock"),
+  "Usage: node scripts/build-manifest-stargate.mjs OUTPUT_DIRECTORY [--refresh-lock]",
+);
 const output = resolve(process.argv[2]);
 const fromRoot = relative(root, output);
 assert.ok(
@@ -69,9 +72,26 @@ function run(command, args, capture = false) {
   return result.stdout;
 }
 console.log(`Standalone Stargate build: ${stage}`);
-run("npm", ["install", "--ignore-scripts", "--audit=false", "--fund=false"]);
+const lockPath = join(root, "scripts/stargate-build-lock.json");
+if (process.argv[3] === "--refresh-lock") {
+  run("npm", ["install", "--package-lock-only", "--ignore-scripts", "--audit=false", "--fund=false"]);
+  cpSync(join(stage, "package-lock.json"), lockPath);
+} else {
+  cpSync(lockPath, join(stage, "package-lock.json"));
+}
+const lock = JSON.parse(readFileSync(lockPath, "utf8"));
+for (const field of ["name", "version", "dependencies", "devDependencies"]) {
+  assert.deepEqual(lock.packages[""][field], manifest[field], `Stale Stargate build lock: ${field}`);
+}
+for (const [path, entry] of Object.entries(lock.packages)) {
+  if (!path) continue;
+  assert.ok(entry.resolved?.startsWith("https://registry.npmjs.org/"), `Non-public registry entry: ${path}`);
+  assert.ok(entry.integrity?.startsWith("sha512-"), `Missing integrity: ${path}`);
+}
+run("npm", ["ci", "--ignore-scripts", "--audit=false", "--fund=false"]);
 run("npm", ["run", "build"]);
 run(process.execPath, ["jasmine-testrunner.js", "--quiet"]);
+run("npm", ["audit", "--omit=dev", "--audit-level=high"]);
 const [packed] = JSON.parse(
   run("npm", ["pack", "--ignore-scripts", "--json", "--pack-destination", output], true),
 );
