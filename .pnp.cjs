@@ -210,7 +210,7 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
         "@confio/ics23",\
         [\
           "@manifest-network/ics23",\
-          "npm:0.6.9"\
+          "npm:0.6.10"\
         ]\
       ],\
       [\
@@ -4217,10 +4217,10 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
         }]\
       ]],\
       ["@manifest-network/ics23", [\
-        ["npm:0.6.9", {\
-          "packageLocation": "./.yarn/cache/@manifest-network-ics23-npm-0.6.9-6e0ab9850b-94f05851cf.zip/node_modules/@manifest-network/ics23/",\
+        ["npm:0.6.10", {\
+          "packageLocation": "./.yarn/cache/@manifest-network-ics23-npm-0.6.10-b06f7c2ec3-bcdd8dde9e.zip/node_modules/@manifest-network/ics23/",\
           "packageDependencies": [\
-            ["@manifest-network/ics23", "npm:0.6.9"],\
+            ["@manifest-network/ics23", "npm:0.6.10"],\
             ["@noble/hashes", "npm:1.0.0"],\
             ["protobufjs", "npm:7.6.6"]\
           ],\
@@ -4234,7 +4234,7 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
             ["@manifest-network/stargate", "workspace:packages/stargate"],\
             ["@confio/ics23", [\
               "@manifest-network/ics23",\
-              "npm:0.6.9"\
+              "npm:0.6.10"\
             ]],\
             ["@cosmjs/amino", "workspace:packages/amino"],\
             ["@cosmjs/crypto", "workspace:packages/crypto"],\
