@@ -10,6 +10,7 @@ import { fileURLToPath } from "node:url";
 
 export const repository = "manifest-network/cosmjs";
 export const workflow = ".github/workflows/manifest-release.yml";
+export const releaseRef = "refs/heads/manifest/0.32";
 export const targets = {
   ics23: { name: "@manifest-network/ics23", directory: "vendor/ics23/js" },
   stargate: { name: "@manifest-network/stargate", directory: "packages/stargate" },
@@ -20,7 +21,7 @@ const json = (path) => JSON.parse(readFileSync(path, "utf8"));
 
 export function assertReleaseContext(context) {
   assert.equal(context.eventName, "workflow_dispatch", "Publication requires a manual workflow dispatch");
-  assert.equal(context.ref, "refs/heads/main", "Publication requires main");
+  assert.equal(context.ref, releaseRef, "Publication requires the maintained manifest/0.32 branch");
   assert.equal(context.repository, repository, "Wrong publication repository");
   assert.match(context.requestedSha ?? "", /^[a-f0-9]{40}$/, "Expected a full reviewed commit SHA");
   assert.equal(context.sha, context.requestedSha, "Dispatch SHA must equal the reviewed SHA");
@@ -240,7 +241,7 @@ async function main() {
           true,
         ),
       );
-      assertVerifiedProvenance(audit, { ...artifact, repository, workflow, ref: "refs/heads/main" });
+      assertVerifiedProvenance(audit, { ...artifact, repository, workflow, ref: releaseRef });
       break;
     } catch (error) {
       if (attempt === 11) throw error;

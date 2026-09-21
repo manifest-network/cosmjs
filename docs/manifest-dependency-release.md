@@ -2,9 +2,12 @@
 
 This repair starts from the source recorded by the published
 `@manifest-network/stargate@0.32.4-ll.3` package:
-`99ad972cc468b27ea4cf482e2d30a3ccb131c86e`. The repository's old `main` is an
-earlier upstream commit and does not contain the released Manifest signing
-workaround. Preserve that released history when reviewing or merging this patch.
+`99ad972cc468b27ea4cf482e2d30a3ccb131c86e`. The protected maintenance branch
+`manifest/0.32` starts from that released source and is the repository's default
+branch. All maintained package changes, review checks, and publication
+dispatches use this branch. `main` remains an upstream reference: it predates
+the released Manifest signing workaround and is not a publication branch.
+Preserve the released history when reviewing or merging maintenance changes.
 
 The initial manual repair published:
 
@@ -82,29 +85,41 @@ problems independently of the source build.
 
 ## Configure publication before dispatch
 
-The workflow is `.github/workflows/manifest-release.yml`. Pull requests build
-and test both packages without write or OIDC permissions. Publication is a
-separate manual dispatch of one exact package version, from `main`, with the
-full reviewed commit SHA as input. The SHA must equal both `GITHUB_SHA` and the
-checked-out commit, because npm provenance records the workflow SHA. Selecting
-another branch or checking out an unrelated SHA is rejected.
+The workflow is `.github/workflows/manifest-release.yml`. Pull requests
+targeting `manifest/0.32` build and test both packages without write or OIDC
+permissions. The existing CodeQL workflow triggers on pushes and pull requests
+for both `manifest/0.32` and the upstream-reference `main` branch. Its legacy
+action versions retain four pre-existing actionlint errors; this branch change
+preserves the trigger coverage without upgrading that separate workflow.
+Publication is a separate manual dispatch of one exact package version, from
+`manifest/0.32`, with the full reviewed commit SHA as input. The SHA must equal
+both `GITHUB_SHA` and the checked-out commit, because npm provenance records the
+workflow SHA. Selecting another branch or checking out an unrelated SHA is
+rejected.
 
-Before any publication, repository administrators must:
+Repository administrators have configured these GitHub controls:
 
-1. Protect `main` with required pull-request review and the two package build
-   checks. Preserve the released Manifest signing history when merging this
-   source branch.
-2. Create the GitHub environment **`npm-release`**, allow deployments only from
-   `main`, require a maintainer reviewer, and prevent self-review where
-   supported. Restrict workflow changes through required review. The checked-in
-   workflow cannot create or enforce GitHub environment settings by itself.
-3. Configure each npm package's trusted publisher with GitHub organization
-   **`manifest-network`**, repository **`cosmjs`**, workflow filename
-   **`manifest-release.yml`** (filename only), environment **`npm-release`**,
-   and the **direct `npm publish` allowed action**. Configure both
-   `@manifest-network/ics23` and `@manifest-network/stargate` separately.
-4. Confirm both GitHub repository and npm packages are public, and remove any
-   legacy automation token fallback for this publication path.
+- `manifest/0.32` is the default branch. Its protection requires both package
+  build checks, one current approving review, and resolved review conversations.
+  It dismisses stale approvals, applies to administrators, and blocks force
+  pushes and branch deletion. CodeQL remains additional source PR coverage; the
+  two package builds are the required status checks.
+- The **`npm-release`** environment permits deployments only from
+  `manifest/0.32`, lists **`fmorency`** and **`joncode`** as reviewers, and
+  prevents self-review. The checked-in workflow cannot create or enforce these
+  account settings.
+- `main` remains the upstream reference. Maintenance merges preserve the
+  released Manifest signing history on `manifest/0.32`.
+
+Before publication, verify those controls still match and configure each npm
+package's trusted publisher with GitHub organization **`manifest-network`**,
+repository **`cosmjs`**, workflow filename **`manifest-release.yml`** (filename
+only), environment **`npm-release`**, and the **direct `npm publish` allowed
+action**. Configure `@manifest-network/ics23` and `@manifest-network/stargate`
+separately. This npm account configuration remains a publication prerequisite;
+adding the workflow does not establish the trust binding. Keep the GitHub
+repository and npm packages public, with no automation-token fallback for this
+publication path.
 
 These are npm/GitHub account settings, not values that a workflow can safely
 infer. The workflow uses official actions pinned to commit hashes, GitHub-hosted
@@ -126,11 +141,11 @@ publishing the replacement Stargate version. The currently committed versions
 already exist; the publication command intentionally rejects them. This workflow
 preparation does not authorize overwriting versions or creating an SDK release.
 
-Dispatch **Manifest dependency release** on `main` with the selected package
-(`ics23` or `stargate`), exact new version, and full reviewed source SHA. Review
-the successful build/test job and the `manifest-PACKAGE` artifact before
-approving the protected environment. The publication job downloads that same
-run's artifact, checks its SHA512 digest, package allowlist, version,
+Dispatch **Manifest dependency release** on `manifest/0.32` with the selected
+package (`ics23` or `stargate`), exact new version, and full reviewed source
+SHA. Review the successful build/test job and the `manifest-PACKAGE` artifact
+before approving the protected environment. The publication job downloads that
+same run's artifact, checks its SHA512 digest, package allowlist, version,
 dependencies, and repository metadata against the reviewed source, and publishes
 the tested tarball with `--provenance --ignore-scripts`. It never publishes all
 CosmJS workspaces.
@@ -139,8 +154,8 @@ After publishing, the workflow requires all of the following:
 
 - Public npm's artifact integrity equals the locally tested tarball.
 - The provenance statement identifies that artifact, this repository, this exact
-  workflow, `main`, the full reviewed source commit, and a GitHub-hosted
-  builder.
+  workflow, `manifest/0.32`, the full reviewed source commit, and a
+  GitHub-hosted builder.
 - `npm audit signatures --json --include-attestations` succeeds in an isolated
   fresh install. Policy checks consume the exact cryptographically verified
   bundle from that command, requiring the signing certificate's workflow URI,

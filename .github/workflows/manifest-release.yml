@@ -2,7 +2,7 @@ name: Manifest dependency release
 
 on:
   pull_request:
-    branches: [main]
+    branches: [manifest/0.32]
   workflow_dispatch:
     inputs:
       package:
@@ -15,7 +15,7 @@ on:
         required: true
         type: string
       source_sha:
-        description: Full reviewed commit SHA (must be the selected main commit)
+        description: Full reviewed commit SHA (must be the selected manifest/0.32 commit)
         required: true
         type: string
 
@@ -71,7 +71,7 @@ jobs:
           retention-days: 14
 
   publish:
-    if: github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/main' && github.repository == 'manifest-network/cosmjs'
+    if: github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/manifest/0.32' && github.repository == 'manifest-network/cosmjs'
     needs: build
     runs-on: ubuntu-24.04
     environment: npm-release

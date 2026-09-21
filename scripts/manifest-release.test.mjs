@@ -12,17 +12,19 @@ import {
 const sha = "a".repeat(40);
 const context = {
   eventName: "workflow_dispatch",
-  ref: "refs/heads/main",
+  ref: "refs/heads/manifest/0.32",
   repository,
   sha,
   requestedSha: sha,
   head: sha,
 };
-test("publication requires the reviewed dispatch and checkout to describe one main commit", () => {
+test("publication requires the reviewed dispatch and checkout to describe one maintained manifest/0.32 commit", () => {
   assertReleaseContext(context);
   for (const changed of [
     { eventName: "pull_request" },
     { eventName: "push" },
+    { ref: "refs/heads/main" },
+    { ref: "refs/tags/v0.32.4-ll.5" },
     { ref: "refs/heads/feature" },
     { repository: "attacker/cosmjs" },
     { requestedSha: "main" },
@@ -57,7 +59,7 @@ test("tarball allowlist rejects package, dependency, and version substitution", 
 const expected = {
   repository,
   workflow,
-  ref: "refs/heads/main",
+  ref: "refs/heads/manifest/0.32",
   name: manifest.name,
   version: manifest.version,
   sha,
@@ -141,11 +143,14 @@ function statement() {
           workflow: {
             repository: `https://github.com/${repository}`,
             path: workflow,
-            ref: "refs/heads/main",
+            ref: "refs/heads/manifest/0.32",
           },
         },
         resolvedDependencies: [
-          { uri: `git+https://github.com/${repository}@refs/heads/main`, digest: { gitCommit: sha } },
+          {
+            uri: `git+https://github.com/${repository}@refs/heads/manifest/0.32`,
+            digest: { gitCommit: sha },
+          },
         ],
       },
       runDetails: { builder: { id: "https://github.com/actions/runner/github-hosted" } },
@@ -164,9 +169,9 @@ test("provenance policy rejects wrong artifact, source, workflow, and builder", 
     (value) => {
       value.predicate.buildDefinition.externalParameters.workflow.path = ".github/workflows/other.yml";
     },
-    (value) => {
-      value.predicate.buildDefinition.externalParameters.workflow.ref = "refs/heads/feature";
-    },
+    ...["refs/heads/main", "refs/tags/v0.32.4-ll.5", "refs/heads/feature"].map((ref) => (value) => {
+      value.predicate.buildDefinition.externalParameters.workflow.ref = ref;
+    }),
     (value) => {
       value.predicate.buildDefinition.externalParameters.workflow.repository =
         "https://github.com/attacker/cosmjs";
