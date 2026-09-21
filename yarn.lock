@@ -279,13 +279,13 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@confio/ics23@npm:@manifest-network/ics23@^0.6.9":
-  version: 0.6.9
-  resolution: "@manifest-network/ics23@npm:0.6.9"
+"@confio/ics23@npm:@manifest-network/ics23@^0.6.10":
+  version: 0.6.10
+  resolution: "@manifest-network/ics23@npm:0.6.10"
   dependencies:
     "@noble/hashes": ^1.0.0
     protobufjs: ^7.6.5
-  checksum: 94f05851cf1df3e9906205e26a0d5207c338b09eafbafc1fc954aa63cf58439a660cc45aed702af43fcf3cd4643d5169634f4bdddeb05070497205e48dfce44f
+  checksum: bcdd8dde9e3d7ca3d0c09a3efb97500033d2fe26257a48b5e80388eb5bbbc237ea42ef7196a4514f4dbd379d095b2670f1ab0d56e65de2996a6efccc2a62a483
   languageName: node
   linkType: hard
 
@@ -1201,7 +1201,7 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "@manifest-network/stargate@workspace:packages/stargate"
   dependencies:
-    "@confio/ics23": "npm:@manifest-network/ics23@^0.6.9"
+    "@confio/ics23": "npm:@manifest-network/ics23@^0.6.10"
     "@cosmjs/amino": "workspace:^"
     "@cosmjs/crypto": "workspace:^"
     "@cosmjs/encoding": "workspace:^"
