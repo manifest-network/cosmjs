@@ -1,6 +1,6 @@
 {
   "name": "@manifest-network/ics23",
-  "version": "0.6.9",
+  "version": "0.6.10",
   "description": "Manifest-maintained ICS23 proof verification with patched protobufjs dependencies",
   "main": "build/index.js",
   "types": "build/index.d.ts",
