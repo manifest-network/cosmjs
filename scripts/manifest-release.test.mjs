@@ -1,7 +1,15 @@
 import assert from "node:assert/strict";
-import { readFileSync } from "node:fs";
+import { mkdtempSync, readFileSync, rmSync, writeFileSync } from "node:fs";
+import { tmpdir } from "node:os";
+import { join } from "node:path";
 import { test } from "node:test";
-import { assertPackedManifest, assertReleaseContext, repository, workflow } from "./manifest-release.mjs";
+import {
+  assertPackedManifest,
+  assertReleaseContext,
+  repository,
+  verifyPublishedArtifact,
+  workflow,
+} from "./manifest-release.mjs";
 
 import {
   assertProvenanceCertificate,
@@ -189,5 +197,122 @@ test("provenance policy rejects wrong artifact, source, workflow, and builder", 
     const value = statement();
     mutate(value);
     assert.throws(() => assertProvenanceStatement(value, expected));
+  }
+});
+
+test("post-publication verification recovers from unavailable versions and delayed attestations", async (t) => {
+  const fixture = JSON.parse(readFileSync(new URL("./fixtures/sdk-0.22.0-provenance.json", import.meta.url)));
+  const consumer = mkdtempSync(join(tmpdir(), "manifest-verification-retry-"));
+  t.after(() => rmSync(consumer, { recursive: true, force: true }));
+  const calls = [];
+  let installs = 0;
+  let audits = 0;
+  let waits = 0;
+  const verifiedAudit = { invalid: [], missing: [], verified: [fixture.verified] };
+  const audit = await verifyPublishedArtifact(fixture.expected, consumer, {
+    attempts: 3,
+    wait: async () => {
+      waits++;
+    },
+    execute(command, args, directory, capture) {
+      assert.equal(command, "npm");
+      assert.equal(directory, consumer);
+      calls.push(args[0]);
+      if (args[0] === "install") {
+        assert.ok(args.includes("--ignore-scripts"));
+        assert.ok(args.includes("--prefer-online"));
+        assert.ok(args.includes(`${fixture.expected.name}@${fixture.expected.version}`));
+        if (++installs === 1) throw new Error("E404: new version not visible yet");
+        writeFileSync(
+          join(consumer, "package-lock.json"),
+          JSON.stringify({
+            packages: {
+              [`node_modules/${fixture.expected.name}`]: { integrity: fixture.expected.integrity },
+            },
+          }),
+        );
+        return;
+      }
+      assert.deepEqual(args, [
+        "audit",
+        "signatures",
+        "--json",
+        "--include-attestations",
+        "--prefer-online",
+        "--registry=https://registry.npmjs.org/",
+      ]);
+      assert.equal(capture, true);
+      if (++audits === 1)
+        return JSON.stringify({
+          ...verifiedAudit,
+          verified: [{ ...fixture.verified, attestationBundles: [] }],
+        });
+      return JSON.stringify(verifiedAudit);
+    },
+  });
+  assert.deepEqual(audit, verifiedAudit);
+  assert.deepEqual(calls, ["install", "install", "audit", "install", "audit"]);
+  assert.equal(waits, 2);
+});
+
+test("post-publication verification exhausts installation retries without publishing", async () => {
+  let installs = 0;
+  let waits = 0;
+  const failure = new Error("E404: version remains unavailable");
+  await assert.rejects(
+    verifyPublishedArtifact(expected, "/unused", {
+      attempts: 3,
+      wait: async () => {
+        waits++;
+      },
+      execute(command, args) {
+        assert.equal(command, "npm");
+        assert.equal(args[0], "install");
+        installs++;
+        throw failure;
+      },
+    }),
+    (error) => error === failure,
+  );
+  assert.equal(installs, 3);
+  assert.equal(waits, 2);
+});
+
+test("retrying publication verification never accepts a wrong artifact or source identity", async (t) => {
+  const fixture = JSON.parse(readFileSync(new URL("./fixtures/sdk-0.22.0-provenance.json", import.meta.url)));
+  const consumer = mkdtempSync(join(tmpdir(), "manifest-verification-policy-"));
+  t.after(() => rmSync(consumer, { recursive: true, force: true }));
+  for (const [integrity, identity, message] of [
+    [expected.integrity, fixture.expected, /differs from the tested tarball/],
+    [fixture.expected.integrity, { ...fixture.expected, sha: "b".repeat(40) }, /Fulcio identity extension/],
+  ]) {
+    let installs = 0;
+    let waits = 0;
+    await assert.rejects(
+      verifyPublishedArtifact(identity, consumer, {
+        attempts: 2,
+        wait: async () => {
+          waits++;
+        },
+        execute(command, args) {
+          assert.equal(command, "npm");
+          if (args[0] === "install") {
+            installs++;
+            writeFileSync(
+              join(consumer, "package-lock.json"),
+              JSON.stringify({
+                packages: { [`node_modules/${identity.name}`]: { integrity } },
+              }),
+            );
+            return;
+          }
+          assert.equal(args[0], "audit");
+          return JSON.stringify({ invalid: [], missing: [], verified: [fixture.verified] });
+        },
+      }),
+      message,
+    );
+    assert.equal(installs, 2);
+    assert.equal(waits, 1);
   }
 });

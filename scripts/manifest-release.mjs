@@ -131,6 +131,64 @@ function verifyPackedConsumer(artifact) {
   console.log(`Fresh packed consumer passed: ${artifact.name}@${artifact.version} (${consumer})`);
 }
 
+export async function verifyPublishedArtifact(
+  expected,
+  consumer,
+  {
+    attempts = 12,
+    execute = run,
+    wait = () => new Promise((resolveWait) => setTimeout(resolveWait, 10_000)),
+  } = {},
+) {
+  assert.ok(Number.isInteger(attempts) && attempts > 0, "Verification needs a bounded positive retry count");
+  for (let attempt = 0; attempt < attempts; attempt++) {
+    try {
+      // Both the new version and its attestation can lag publication. Retry the
+      // complete read/verification sequence without ever repeating npm publish.
+      execute(
+        "npm",
+        [
+          "install",
+          "--ignore-scripts",
+          "--audit=false",
+          "--fund=false",
+          "--save-exact",
+          "--prefer-online",
+          `${expected.name}@${expected.version}`,
+          `--registry=${registry}`,
+        ],
+        consumer,
+      );
+      const installed = json(join(consumer, "package-lock.json")).packages[`node_modules/${expected.name}`];
+      assert.equal(
+        installed?.integrity,
+        expected.integrity,
+        "Installed registry artifact differs from the tested tarball",
+      );
+      const audit = JSON.parse(
+        execute(
+          "npm",
+          [
+            "audit",
+            "signatures",
+            "--json",
+            "--include-attestations",
+            "--prefer-online",
+            `--registry=${registry}`,
+          ],
+          consumer,
+          true,
+        ),
+      );
+      assertVerifiedProvenance(audit, expected);
+      return audit;
+    } catch (error) {
+      if (attempt === attempts - 1) throw error;
+      await wait();
+    }
+  }
+}
+
 async function main() {
   const [command, target, outputArgument, version, sha] = process.argv.slice(2);
   if (command === "guard") {
@@ -215,44 +273,11 @@ async function main() {
     join(consumer, "package.json"),
     JSON.stringify({ name: "manifest-release-verification", version: "1.0.0", private: true }),
   );
-  run(
-    "npm",
-    [
-      "install",
-      "--ignore-scripts",
-      "--audit=false",
-      "--fund=false",
-      "--save-exact",
-      `${artifact.name}@${artifact.version}`,
-      `--registry=${registry}`,
-    ],
-    consumer,
-  );
   // Decoding a payload does not verify its signature. npm verifies the registry
   // signatures and Sigstore provenance before this job accepts publication.
-  let audit;
-  for (let attempt = 0; attempt < 12; attempt++) {
-    try {
-      audit = JSON.parse(
-        run(
-          "npm",
-          ["audit", "signatures", "--json", "--include-attestations", `--registry=${registry}`],
-          consumer,
-          true,
-        ),
-      );
-      assertVerifiedProvenance(audit, { ...artifact, repository, workflow, ref: releaseRef });
-      break;
-    } catch (error) {
-      if (attempt === 11) throw error;
-      await new Promise((resolveWait) => setTimeout(resolveWait, 3000));
-    }
-  }
-  const installed = json(join(consumer, "package-lock.json")).packages[`node_modules/${artifact.name}`];
-  assert.equal(
-    installed?.integrity,
-    artifact.integrity,
-    "Installed registry artifact differs from the tested tarball",
+  const audit = await verifyPublishedArtifact(
+    { ...artifact, repository, workflow, ref: releaseRef },
+    consumer,
   );
   writeFileSync(
     join(output, "verified-publication.json"),
