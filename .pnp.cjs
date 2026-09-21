@@ -208,7 +208,10 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
       ],\
       [\
         "@confio/ics23",\
-        "npm:0.6.8"\
+        [\
+          "@manifest-network/ics23",\
+          "npm:0.6.9"\
+        ]\
       ],\
       [\
         "@cosmjs/amino",\
@@ -3228,17 +3231,6 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
           "linkType": "HARD"\
         }]\
       ]],\
-      ["@confio/ics23", [\
-        ["npm:0.6.8", {\
-          "packageLocation": "./.yarn/cache/@confio-ics23-npm-0.6.8-c87607eb2c-376d72f644.zip/node_modules/@confio/ics23/",\
-          "packageDependencies": [\
-            ["@confio/ics23", "npm:0.6.8"],\
-            ["@noble/hashes", "npm:1.0.0"],\
-            ["protobufjs", "npm:6.11.4"]\
-          ],\
-          "linkType": "HARD"\
-        }]\
-      ]],\
       ["@cosmjs/amino", [\
         ["workspace:packages/amino", {\
           "packageLocation": "./packages/amino/",\
@@ -4224,12 +4216,26 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
           "linkType": "HARD"\
         }]\
       ]],\
+      ["@manifest-network/ics23", [\
+        ["npm:0.6.9", {\
+          "packageLocation": "./.yarn/cache/@manifest-network-ics23-npm-0.6.9-6e0ab9850b-94f05851cf.zip/node_modules/@manifest-network/ics23/",\
+          "packageDependencies": [\
+            ["@manifest-network/ics23", "npm:0.6.9"],\
+            ["@noble/hashes", "npm:1.0.0"],\
+            ["protobufjs", "npm:7.6.6"]\
+          ],\
+          "linkType": "HARD"\
+        }]\
+      ]],\
       ["@manifest-network/stargate", [\
         ["workspace:packages/stargate", {\
           "packageLocation": "./packages/stargate/",\
           "packageDependencies": [\
             ["@manifest-network/stargate", "workspace:packages/stargate"],\
-            ["@confio/ics23", "npm:0.6.8"],\
+            ["@confio/ics23", [\
+              "@manifest-network/ics23",\
+              "npm:0.6.9"\
+            ]],\
             ["@cosmjs/amino", "workspace:packages/amino"],\
             ["@cosmjs/crypto", "workspace:packages/crypto"],\
             ["@cosmjs/encoding", "workspace:packages/encoding"],\
@@ -4363,6 +4369,13 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
             ["@protobufjs/codegen", "npm:2.0.4"]\
           ],\
           "linkType": "HARD"\
+        }],\
+        ["npm:2.0.5", {\
+          "packageLocation": "./.yarn/cache/@protobufjs-codegen-npm-2.0.5-bb74ff329d-b5f1e43b4b.zip/node_modules/@protobufjs/codegen/",\
+          "packageDependencies": [\
+            ["@protobufjs/codegen", "npm:2.0.5"]\
+          ],\
+          "linkType": "HARD"\
         }]\
       ]],\
       ["@protobufjs/eventemitter", [\
@@ -4370,6 +4383,13 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
           "packageLocation": "./.yarn/cache/@protobufjs-eventemitter-npm-1.1.0-029cc7d431-0369163a3d.zip/node_modules/@protobufjs/eventemitter/",\
           "packageDependencies": [\
             ["@protobufjs/eventemitter", "npm:1.1.0"]\
+          ],\
+          "linkType": "HARD"\
+        }],\
+        ["npm:1.1.1", {\
+          "packageLocation": "./.yarn/cache/@protobufjs-eventemitter-npm-1.1.1-dbe0dfc812-7f8cb422eb.zip/node_modules/@protobufjs/eventemitter/",\
+          "packageDependencies": [\
+            ["@protobufjs/eventemitter", "npm:1.1.1"]\
           ],\
           "linkType": "HARD"\
         }]\
@@ -4381,6 +4401,14 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
             ["@protobufjs/fetch", "npm:1.1.0"],\
             ["@protobufjs/aspromise", "npm:1.1.2"],\
             ["@protobufjs/inquire", "npm:1.1.0"]\
+          ],\
+          "linkType": "HARD"\
+        }],\
+        ["npm:1.1.1", {\
+          "packageLocation": "./.yarn/cache/@protobufjs-fetch-npm-1.1.1-b98d5396a8-64a5be675a.zip/node_modules/@protobufjs/fetch/",\
+          "packageDependencies": [\
+            ["@protobufjs/fetch", "npm:1.1.1"],\
+            ["@protobufjs/aspromise", "npm:1.1.2"]\
           ],\
           "linkType": "HARD"\
         }]\
@@ -4426,6 +4454,13 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
           "packageLocation": "./.yarn/cache/@protobufjs-utf8-npm-1.1.0-02c590807c-f9bf3163d1.zip/node_modules/@protobufjs/utf8/",\
           "packageDependencies": [\
             ["@protobufjs/utf8", "npm:1.1.0"]\
+          ],\
+          "linkType": "HARD"\
+        }],\
+        ["npm:1.1.2", {\
+          "packageLocation": "./.yarn/cache/@protobufjs-utf8-npm-1.1.2-9c7ca5968f-7abb5abdd9.zip/node_modules/@protobufjs/utf8/",\
+          "packageDependencies": [\
+            ["@protobufjs/utf8", "npm:1.1.2"]\
           ],\
           "linkType": "HARD"\
         }]\
@@ -9954,6 +9989,13 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
             ["long", "npm:4.0.0"]\
           ],\
           "linkType": "HARD"\
+        }],\
+        ["npm:5.3.2", {\
+          "packageLocation": "./.yarn/cache/long-npm-5.3.2-f80d0f7d39-be215816b5.zip/node_modules/long/",\
+          "packageDependencies": [\
+            ["long", "npm:5.3.2"]\
+          ],\
+          "linkType": "HARD"\
         }]\
       ]],\
       ["lru-cache", [\
@@ -11064,7 +11106,7 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
       ]],\
       ["protobufjs", [\
         ["npm:6.11.4", {\
-          "packageLocation": "./.yarn/unplugged/protobufjs-npm-6.11.4-af11968b80/node_modules/protobufjs/",\
+          "packageLocation": "./.yarn/cache/protobufjs-npm-6.11.4-af11968b80-b2fc6a0189.zip/node_modules/protobufjs/",\
           "packageDependencies": [\
             ["protobufjs", "npm:6.11.4"],\
             ["@protobufjs/aspromise", "npm:1.1.2"],\
@@ -11080,6 +11122,24 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
             ["@types/long", "npm:4.0.1"],\
             ["@types/node", "npm:18.15.11"],\
             ["long", "npm:4.0.0"]\
+          ],\
+          "linkType": "HARD"\
+        }],\
+        ["npm:7.6.6", {\
+          "packageLocation": "./.yarn/cache/protobufjs-npm-7.6.6-a7cfb0c5d5-30945587dd.zip/node_modules/protobufjs/",\
+          "packageDependencies": [\
+            ["protobufjs", "npm:7.6.6"],\
+            ["@protobufjs/aspromise", "npm:1.1.2"],\
+            ["@protobufjs/base64", "npm:1.1.2"],\
+            ["@protobufjs/codegen", "npm:2.0.5"],\
+            ["@protobufjs/eventemitter", "npm:1.1.1"],\
+            ["@protobufjs/fetch", "npm:1.1.1"],\
+            ["@protobufjs/float", "npm:1.0.2"],\
+            ["@protobufjs/path", "npm:1.1.2"],\
+            ["@protobufjs/pool", "npm:1.1.0"],\
+            ["@protobufjs/utf8", "npm:1.1.2"],\
+            ["@types/node", "npm:18.15.11"],\
+            ["long", "npm:5.3.2"]\
           ],\
           "linkType": "HARD"\
         }]\

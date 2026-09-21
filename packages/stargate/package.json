@@ -1,6 +1,6 @@
 {
   "name": "@manifest-network/stargate",
-  "version": "0.32.4-ll.3",
+  "version": "0.32.4-ll.4",
   "description": "Utilities for Cosmos SDK 0.40",
   "contributors": [
     "Simon Warta <webmaster128@users.noreply.github.com>"
@@ -38,7 +38,7 @@
     "pack-web": "yarn build-or-skip && webpack --mode development --config webpack.web.config.js"
   },
   "dependencies": {
-    "@confio/ics23": "^0.6.8",
+    "@confio/ics23": "npm:@manifest-network/ics23@^0.6.9",
     "@cosmjs/amino": "workspace:^",
     "@cosmjs/encoding": "workspace:^",
     "@cosmjs/math": "workspace:^",
